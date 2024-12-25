@@ -23,7 +23,7 @@ def create_inverted_index(data):
     return inverted_index
 
 # Open the save file
-filepath = "wiki_scrape.json"
+filepath = "parsed_scrape.json"
 with open(filepath, "r", encoding="utf-8") as file:
     data = json.load(file)
 

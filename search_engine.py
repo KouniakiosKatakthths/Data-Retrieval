@@ -54,20 +54,6 @@ def request_query(query: str, index: dict) -> set:
 
     return result
 
-# Open the save file
-filepath = "inverted_index.json"
-with open(filepath, "r", encoding="utf-8") as file:
-    data = json.load(file)
-
-
-query = input("Request query: ")
-sites = request_query(query, data)
-
-for res in sites:
-    print(res) 
-
-#β) Κατάταξη αποτελεσμάτων (Ranking)
-
 def ranking(method_id,documents,query):
 
     if method_id == 1:
@@ -82,3 +68,16 @@ def ranking(method_id,documents,query):
         return np.argsort(scores[0])[::-1]
 
     return
+
+
+# Open the save file
+filepath = "inverted_index.json"
+with open(filepath, "r", encoding="utf-8") as file:
+    data = json.load(file)
+
+
+query = input("Request query: ")
+sites = request_query(query, data)
+
+for res in sites:
+    print(res) 

@@ -10,9 +10,6 @@ def create_inverted_index(data):
 
         # For each paragraph of the entry
         for p_index, paragraph in enumerate(site_data["content"]):
-            # Remove any caps
-            paragraph = paragraph.lower();
-
             # Take only the unique words inside the paragraph
             # Split them using the ' '
             words = set(paragraph.split()) 

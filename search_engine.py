@@ -2,7 +2,11 @@ import nltk.stem
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
+import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
+"""
 def request_query(query: str, index: dict) -> set:
     # Init nltk objects
     lemmatizer = WordNetLemmatizer()
@@ -35,3 +39,22 @@ algorithm = input("Select retrieval algorithn (1/2/3): ")
 while (algorithm != '1' and algorithm != '2' and algorithm != '3'):
     algorithm = input("Invalid option. Select retrieval algorithn (1/2/3): ")
 
+"""
+
+#β) Κατάταξη αποτελεσμάτων (Ranking)
+
+def ranking(method_id,documents,query):
+
+    if method_id == 1:
+        #Δημιουργία TF-IDF Μήτρας
+        vectorizer = TfidfVectorizer() 
+        vector = vectorizer.fit_transform(documents) 
+        #Μετατροπή του Query σε Διάνυσμα TF-IDF
+        query_vector = vectorizer.transform([query])
+        #Υπολογισμός Ομοιότητας
+        scores = cosine_similarity(vector,query_vector)
+        #Κατάταξη βάσει ομοιότητας και επιστροφή
+        return np.argsort(scores[0])[::-1]
+
+    return
+    

@@ -9,6 +9,10 @@ from nltk.stem import WordNetLemmatizer
 logic_operators = {"and", "or", "not"};
 
 def boolean_retrieval(query: str, index: dict) -> set:
+    
+    if not query: 
+        return {}
+
     # Init nltk objects
     lemmatizer = WordNetLemmatizer()
     stop_words = set(stopwords.words('english')) - logic_operators
@@ -51,7 +55,10 @@ def boolean_retrieval(query: str, index: dict) -> set:
     return result
 
 def ranking_TF_IDF(result_set: set, parsed_scrape: dict, query: str):
-    
+
+    if not query:
+        return {}
+
     # Init nltk objects
     lemmatizer = WordNetLemmatizer()
     stop_words = set(stopwords.words('english')) - logic_operators

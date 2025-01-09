@@ -6,9 +6,9 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
-def boolean_retrieval(query: str, index: dict) -> set:
-    logic_operators = {"and", "or", "not"};
+logic_operators = {"and", "or", "not"};
 
+def boolean_retrieval(query: str, index: dict) -> set:
     # Init nltk objects
     lemmatizer = WordNetLemmatizer()
     stop_words = set(stopwords.words('english')) - logic_operators
@@ -50,7 +50,17 @@ def boolean_retrieval(query: str, index: dict) -> set:
 
     return result
 
-def ranking_TF_IDF(result_set: set, parsed_scrape: dict):
+def ranking_TF_IDF(result_set: set, parsed_scrape: dict, query: str):
+    
+    # Init nltk objects
+    lemmatizer = WordNetLemmatizer()
+    stop_words = set(stopwords.words('english')) - logic_operators
+
+    # Preprossess query to remove any unwanted words or characters
+    tokens = word_tokenize(query.lower())
+    non_stopwords_tokens = [word for word in tokens if word.lower() not in stop_words]
+    lemmatized_query = " ".join([lemmatizer.lemmatize(word) for word in non_stopwords_tokens])
+
     # Combine the URL and the paragraphs in a signle line
     documents = {entry['website_url']: " ".join(entry['content']) for entry in parsed_scrape}
     
@@ -61,10 +71,9 @@ def ranking_TF_IDF(result_set: set, parsed_scrape: dict):
     vectorizer = TfidfVectorizer()
     tfidf_matrix = vectorizer.fit_transform(documents.values())
 
-    # The results of the search in TF-IDF 
-    result_vector = vectorizer.transform([" ".join(result_set)])
+    query_vector = vectorizer.transform([lemmatized_query])
 
-    scores = cosine_similarity(result_vector, tfidf_matrix).flatten()
+    scores = cosine_similarity(query_vector, tfidf_matrix).flatten()
     ranked_results = sorted(zip(documents.keys(), scores), key=lambda x: x[1], reverse=True)
 
     return ranked_results
@@ -76,6 +85,7 @@ if __name__ == "__main__":
     with open(inverted_index_filepath, "r", encoding="utf-8") as file:
         inverted_index = json.load(file)
 
+    # Open the parsed data (Used for TF-IDF matrix init)
     parsed_scrape_filepath = "parsed_scrape.json"
     with open(parsed_scrape_filepath, "r", encoding="utf-8") as file:
         parsed_scrape = json.load(file)
@@ -83,7 +93,7 @@ if __name__ == "__main__":
     query = input("Request query: ")
     result_set = boolean_retrieval(query, inverted_index)
 
-    ranked_results = ranking_TF_IDF(result_set, parsed_scrape)
+    ranked_results = ranking_TF_IDF(result_set, parsed_scrape, query)
 
     for score, url in ranked_results:
-        print(f"Score: {score}. For URL: {url}")
+        print(f"URL: {score}. Score: {url}")

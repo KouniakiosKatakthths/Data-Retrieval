@@ -73,7 +73,7 @@ def ranking_TF_IDF(result_set: set, parsed_scrape: dict, query: str):
 
     query_vector = vectorizer.transform([lemmatized_query])
 
-    scores = cosine_similarity(query_vector, tfidf_matrix).flatten()
+    scores = cosine_similarity(query_vector, tfidf_matrix).flatten()  # Using flatter to conv to vectoer
     ranked_results = sorted(zip(documents.keys(), scores), key=lambda x: x[1], reverse=True)
 
     return ranked_results
@@ -81,13 +81,11 @@ def ranking_TF_IDF(result_set: set, parsed_scrape: dict, query: str):
 
 if __name__ == "__main__":
     # Open the inverted index save file
-    inverted_index_filepath = "inverted_index.json"
-    with open(inverted_index_filepath, "r", encoding="utf-8") as file:
+    with open('inverted_index.json', 'r') as file:
         inverted_index = json.load(file)
 
     # Open the parsed data (Used for TF-IDF matrix init)
-    parsed_scrape_filepath = "parsed_scrape.json"
-    with open(parsed_scrape_filepath, "r", encoding="utf-8") as file:
+    with open('parsed_scrape.json', 'r') as file:
         parsed_scrape = json.load(file)
 
     query = input("Request query: ")

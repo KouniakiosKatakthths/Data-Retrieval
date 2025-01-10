@@ -6,9 +6,11 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
+from rank_bm25 import BM25Okapi
+
 logic_operators = {"and", "or", "not"}
 
-def preprocess_query(query: str, exclude_words) -> str:
+def preprocess_query(query: str, exclude_words = set()) -> str:
 
     # Init nltk objects
     lemmatizer = WordNetLemmatizer()
@@ -70,7 +72,7 @@ def ranking_TF_IDF(parsed_scrape: dict, query: str, result_set: set = None):
     # Combine the URL and the paragraphs in a signle line
     documents = {entry['website_url']: " ".join(entry['content']) for entry in parsed_scrape}
     
-    # A Result set has been proviteded
+    # A Result set has been provided
     if result_set is not None:
 
         # Remove documents that arent in the result set
@@ -96,6 +98,31 @@ def vsm_retrieval(query: str, parsed_scrape: dict):
     results = ranking_TF_IDF(parsed_scrape, processed_query)
     return results
 
+def probabilistic_retrieval(parsed_scrape: list, query: str):
+    if not query:
+        return []
+
+    # Preprocess the query
+    processed_query = preprocess_query(query)
+
+    # Combine the URL and the paragraphs in a signle line
+    documents = {entry['website_url']: " ".join(entry['content']) for entry in parsed_scrape}
+
+    # Tokenize documents
+    tokenized_documents = [word_tokenize(doc.lower()) for doc in documents.values()]
+
+    # Initialize BM25 model
+    bm25 = BM25Okapi(tokenized_documents)
+
+    # Tokenize the query
+    tokenized_query = word_tokenize(processed_query)
+
+    # Get BM25 scores
+    scores = bm25.get_scores(tokenized_query)
+    ranked_results = sorted(zip(documents.keys(),scores), key=lambda x: x[1], reverse=True)
+
+    return ranked_results
+
 if __name__ == "__main__":
     # Open the inverted index save file
     with open('inverted_index.json', 'r') as file:
@@ -105,6 +132,10 @@ if __name__ == "__main__":
     with open('parsed_scrape.json', 'r') as file:
         parsed_scrape = json.load(file)
 
+    print("Options:")
+    print("1. Boolean Retrieval")
+    print("2. Vector Space Model (TF-IDF Ranking)")
+    print("3. Okapi BM25")
     option = input("1,2,3: ")
     query = input("Request query: ")
 
@@ -114,8 +145,13 @@ if __name__ == "__main__":
         result_set = ranking_TF_IDF(parsed_scrape, query, bool_results)
     elif option == "2":
         result_set = vsm_retrieval(query, parsed_scrape)
+    elif option == "3":
+        result_set = probabilistic_retrieval(parsed_scrape,query)
     else:
+        print("Invalid option.")
         exit()
 
+    print("\nResults: ")
     for score, url in result_set:
         print(f"URL: {score}. Score: {url}")
+

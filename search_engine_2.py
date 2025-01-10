@@ -10,7 +10,7 @@ from rank_bm25 import BM25Okapi
 
 logic_operators = {"and", "or", "not"}
 
-def preprocess_query(query: str, exclude_words = set()) -> str:
+def preprocess_query(query: str, exclude_words: set = set()) -> str:
 
     # Init nltk objects
     lemmatizer = WordNetLemmatizer()

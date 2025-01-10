@@ -7,10 +7,20 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
 def clear_special_char(text: str) -> str:
-    regex = r"[^a-zA-Z0-9\s]"  # Keep only letters and numbers
-    text = re.sub(regex, "", text)
-    text = text.strip()
-    return text
+    brackets_regex = r"\[[^\]]*\]"
+    alpharethmetic_regex = r"[^a-zA-Z0-9\s]"
+
+    # Remove the references like [55] or [a]
+    parsed_text = re.sub(brackets_regex, "", text)
+
+    # The '-' many times is used as seperator to seperate the words with a ' '
+    parsed_text = re.sub('-', " ", parsed_text)
+    # Remove any non alapharithmetic char
+    parsed_text = re.sub(alpharethmetic_regex, "", parsed_text)
+
+    parsed_text.strip()
+
+    return parsed_text
 
 def preprocess_text(text: str) -> str:
     # Lemmatizer and stop word objects for english
@@ -60,7 +70,7 @@ json_object = [
 # Save as JSON file
 filename = "parsed_scrape.json"
 try:
-    with open(filename, "w", encoding="utf-8") as file:
+    with open(filename, "w") as file:
         json.dump(json_object, file, indent=4)
     print(f"Data saved to JSON file: {filename}")
 except IOError as e:

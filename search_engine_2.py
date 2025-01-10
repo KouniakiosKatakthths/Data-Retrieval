@@ -6,25 +6,30 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
-logic_operators = {"and", "or", "not"};
+logic_operators = {"and", "or", "not"}
+
+def preprocess_query(query: str, exclude_words) -> str:
+
+    # Init nltk objects
+    lemmatizer = WordNetLemmatizer()
+    stop_words = set(stopwords.words('english')) - exclude_words
+
+    # Tokenize query
+    tokens = word_tokenize(query.lower())
+    # Remove all the stop words inside the query tokens
+    non_stopwords_tokens = [word for word in tokens if word.lower() not in stop_words]
+    # Lematize the remain words
+    lemmatized_query = " ".join([lemmatizer.lemmatize(word) for word in non_stopwords_tokens])
+
+    return lemmatized_query
 
 def boolean_retrieval(query: str, index: dict) -> set:
     
     if not query: 
         return {}
-
-    # Init nltk objects
-    lemmatizer = WordNetLemmatizer()
-    stop_words = set(stopwords.words('english')) - logic_operators
-
-    # Tokenize query
-    tokens = word_tokenize(query.lower())
-
-    # Remove all the stop words inside the query tokens
-    non_stopwords_tokens = [word for word in tokens if word.lower() not in stop_words]
-
-    # Lematize the remain words
-    lemmatized_query = [lemmatizer.lemmatize(word) for word in non_stopwords_tokens];
+    
+    # Preprossess query to remove any unwanted words or characters, keeping the logic ops
+    lemmatized_query = preprocess_query(query, logic_operators)
 
     # Remove any duplicates
     result = set()
@@ -54,25 +59,22 @@ def boolean_retrieval(query: str, index: dict) -> set:
 
     return result
 
-def ranking_TF_IDF(result_set: set, parsed_scrape: dict, query: str):
+def ranking_TF_IDF(parsed_scrape: dict, query: str, result_set: set = None):
 
     if not query:
         return {}
 
-    # Init nltk objects
-    lemmatizer = WordNetLemmatizer()
-    stop_words = set(stopwords.words('english')) - logic_operators
-
-    # Preprossess query to remove any unwanted words or characters
-    tokens = word_tokenize(query.lower())
-    non_stopwords_tokens = [word for word in tokens if word.lower() not in stop_words]
-    lemmatized_query = " ".join([lemmatizer.lemmatize(word) for word in non_stopwords_tokens])
+    # Preprocess the query
+    lemmatized_query = preprocess_query(query, logic_operators)
 
     # Combine the URL and the paragraphs in a signle line
     documents = {entry['website_url']: " ".join(entry['content']) for entry in parsed_scrape}
     
-    # Remove documents that arent in the result set
-    documents = {url: content for url, content in documents.items() if url in result_set}
+    # A Result set has been proviteded
+    if result_set is not None:
+
+        # Remove documents that arent in the result set
+        documents = {url: content for url, content in documents.items() if url in result_set}
 
     # Init the TF-IDF matrix
     vectorizer = TfidfVectorizer()
@@ -85,6 +87,14 @@ def ranking_TF_IDF(result_set: set, parsed_scrape: dict, query: str):
 
     return ranked_results
 
+def vsm_retrieval(query: str, parsed_scrape: dict):
+    if not query:
+        return {}
+
+    processed_query = preprocess_query(query)
+
+    results = ranking_TF_IDF(parsed_scrape, processed_query)
+    return results
 
 if __name__ == "__main__":
     # Open the inverted index save file
@@ -95,10 +105,17 @@ if __name__ == "__main__":
     with open('parsed_scrape.json', 'r') as file:
         parsed_scrape = json.load(file)
 
+    option = input("1,2,3: ")
     query = input("Request query: ")
-    result_set = boolean_retrieval(query, inverted_index)
 
-    ranked_results = ranking_TF_IDF(result_set, parsed_scrape, query)
+    result_set = set()
+    if option == "1":
+        bool_results = boolean_retrieval(query, inverted_index)
+        result_set = ranking_TF_IDF(parsed_scrape, query, bool_results)
+    elif option == "2":
+        result_set = vsm_retrieval(query, parsed_scrape)
+    else:
+        exit()
 
-    for score, url in ranked_results:
+    for score, url in result_set:
         print(f"URL: {score}. Score: {url}")

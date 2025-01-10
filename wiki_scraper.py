@@ -51,7 +51,7 @@ def fetch_wikipedia(URL, depth_limit, depth = 1):
 
 
 #Fetch info for link with max recusive search of 2
-results = fetch_wikipedia("https://en.wikipedia.org/wiki/Wikipedia:Very_short_featured_articles", 2)
+results = fetch_wikipedia("https://en.wikipedia.org/wiki/World_War_II", 2)
 
 filename = "wiki_scrape.json"
 

@@ -1,0 +1,4 @@
+*.json
+inverted_index.json
+parsed_scrape.json
+wiki_scrape.json

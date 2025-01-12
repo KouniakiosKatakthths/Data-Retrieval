@@ -1,4 +1,5 @@
 import json
+import sys
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -39,7 +40,7 @@ def boolean_retrieval(query: str, index: dict) -> set:
     # Default search op is logic or
     op = "or"
 
-    for token in lemmatized_query:
+    for token in lemmatized_query.split():
         # Chnage mode
         if token.lower() in logic_operators:
             op = token.lower()
@@ -123,6 +124,20 @@ def probabilistic_retrieval(parsed_scrape: list, query: str):
 
     return ranked_results
 
+def dataRetrival(inverted_index: dict, parsed_scrape: dict, option: str, query: str) -> set:
+    result_set = set()
+    if option == "1":
+        bool_results = boolean_retrieval(query, inverted_index)
+        result_set = ranking_TF_IDF(parsed_scrape, query, bool_results)
+    elif option == "2":
+        result_set = vsm_retrieval(query, parsed_scrape)
+    elif option == "3":
+        result_set = probabilistic_retrieval(parsed_scrape,query)
+    else:
+        raise Exception(f"Invalid Retrival Method: \"{option}\"")
+    
+    return result_set
+
 if __name__ == "__main__":
     # Open the inverted index save file
     with open('inverted_index.json', 'r') as file:
@@ -133,25 +148,18 @@ if __name__ == "__main__":
         parsed_scrape = json.load(file)
 
     print("Options:")
+    print("0. Exit")
     print("1. Boolean Retrieval")
     print("2. Vector Space Model (TF-IDF Ranking)")
     print("3. Okapi BM25")
-    option = input("1,2,3: ")
+    option = input("0,1,2,3: ")
+    if option == "0":
+        exit()
+
     query = input("Request query: ")
 
-    result_set = set()
-    if option == "1":
-        bool_results = boolean_retrieval(query, inverted_index)
-        result_set = ranking_TF_IDF(parsed_scrape, query, bool_results)
-    elif option == "2":
-        result_set = vsm_retrieval(query, parsed_scrape)
-    elif option == "3":
-        result_set = probabilistic_retrieval(parsed_scrape,query)
-    else:
-        print("Invalid option.")
-        exit()
+    result_set = dataRetrival(inverted_index, parsed_scrape, option, query)
 
     print("\nResults: ")
     for score, url in result_set:
         print(f"URL: {score}. Score: {url}")
-

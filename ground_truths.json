@@ -15,5 +15,31 @@
             "https://en.wikipedia.org/wiki/Allies_of_World_War_II",
             "https://en.wikipedia.org/wiki/Second_Sino-Japanese_War"
         ]
+    },
+    {
+        "query": "United Kingdom and not Germany",
+        "links": [
+            "https://en.wikipedia.org/wiki/South-East_Asian_theatre_of_World_War_II",
+            "https://en.wikipedia.org/wiki/Japanese_occupation_of_the_Philippines",
+            "https://en.wikipedia.org/wiki/Attacks_on_Australia_during_World_War_II",
+            "https://en.wikipedia.org/wiki/Matilda_II",
+            "https://en.wikipedia.org/wiki/Invasion_of_Lingayen_Gulf"
+        ]
+    },
+    {
+        "query": "United States in the Pacific",
+        "links": [
+            "https://en.wikipedia.org/wiki/United_States",
+            "https://en.wikipedia.org/wiki/Allies_of_World_War_II",
+            "https://en.wikipedia.org/wiki/World_War_II",
+            "https://en.wikipedia.org/wiki/Aftermath_of_World_War_II",
+            "https://en.wikipedia.org/wiki/Axis_powers",
+            "https://en.wikipedia.org/wiki/Soviet_Union",
+            "https://en.wikipedia.org/wiki/South-East_Asian_theatre_of_World_War_II",
+            "https://en.wikipedia.org/wiki/Pacific_War",
+            "https://en.wikipedia.org/wiki/American_theater_(World_War_II)",
+            "https://en.wikipedia.org/wiki/Empire_of_Japan",
+            "https://en.wikipedia.org/wiki/Japanese_occupation_of_the_Philippines"
+        ]
     }
 ]

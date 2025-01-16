@@ -51,7 +51,7 @@ def boolean_retrieval(query: str, index: dict) -> set:
         
         url_list = set(index[token])
 
-        # Sets allow logic operations on 
+        # Sets allow logic operations on pyth
         if op == "or":
             result |= url_list  # If or join the two url lists
         elif op == "and":

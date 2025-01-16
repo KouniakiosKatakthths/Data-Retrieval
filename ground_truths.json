@@ -1,0 +1,19 @@
+[
+    {
+        "query": "Junkers Ju 87",
+        "links": [
+            "https://en.wikipedia.org/wiki/Junkers_Ju_87",
+            "https://en.wikipedia.org/wiki/Battle_of_Britain",
+            "https://en.wikipedia.org/wiki/Battle_of_France",
+            "https://en.wikipedia.org/wiki/Invasion_of_Poland"
+        ]
+    },
+    {
+        "query": "Major Battles",
+        "links": [
+            "https://en.wikipedia.org/wiki/Battle_of_Stalingrad",
+            "https://en.wikipedia.org/wiki/Allies_of_World_War_II",
+            "https://en.wikipedia.org/wiki/Second_Sino-Japanese_War"
+        ]
+    }
+]

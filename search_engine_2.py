@@ -25,6 +25,34 @@ def preprocess_query(query: str, exclude_words: set = set()) -> str:
 
     return lemmatized_query
 
+def ranking_TF_IDF(parsed_scrape: dict, query: str, result_set: set = None):
+
+    if not query:
+        return {}
+
+    # Preprocess the query
+    lemmatized_query = preprocess_query(query, logic_operators)
+
+    # Combine the URL and the paragraphs in a signle line
+    documents = {entry['website_url']: " ".join(entry['content']) for entry in parsed_scrape}
+    
+    # A Result set has been provided
+    if result_set is not None:
+
+        # Remove documents that arent in the result set
+        documents = {url: content for url, content in documents.items() if url in result_set}
+
+    # Init the TF-IDF matrix
+    vectorizer = TfidfVectorizer()
+    tfidf_matrix = vectorizer.fit_transform(documents.values())
+
+    query_vector = vectorizer.transform([lemmatized_query])
+
+    scores = cosine_similarity(query_vector, tfidf_matrix).flatten()  # Using flatter to conv to vectoer
+    ranked_results = sorted(zip(documents.keys(), scores), key=lambda x: x[1], reverse=True)
+
+    return ranked_results
+    
 def boolean_retrieval(query: str, index: dict) -> set:
     
     if not query: 
@@ -60,34 +88,6 @@ def boolean_retrieval(query: str, index: dict) -> set:
             result -= url_list  # If not remove the links from the result
 
     return result
-
-def ranking_TF_IDF(parsed_scrape: dict, query: str, result_set: set = None):
-
-    if not query:
-        return {}
-
-    # Preprocess the query
-    lemmatized_query = preprocess_query(query, logic_operators)
-
-    # Combine the URL and the paragraphs in a signle line
-    documents = {entry['website_url']: " ".join(entry['content']) for entry in parsed_scrape}
-    
-    # A Result set has been provided
-    if result_set is not None:
-
-        # Remove documents that arent in the result set
-        documents = {url: content for url, content in documents.items() if url in result_set}
-
-    # Init the TF-IDF matrix
-    vectorizer = TfidfVectorizer()
-    tfidf_matrix = vectorizer.fit_transform(documents.values())
-
-    query_vector = vectorizer.transform([lemmatized_query])
-
-    scores = cosine_similarity(query_vector, tfidf_matrix).flatten()  # Using flatter to conv to vectoer
-    ranked_results = sorted(zip(documents.keys(), scores), key=lambda x: x[1], reverse=True)
-
-    return ranked_results
 
 def vsm_retrieval(query: str, parsed_scrape: dict):
     if not query:

@@ -18,16 +18,16 @@ class EvaluationValues:
 
 
 def evaluate_query(results, ground_truth_set: set) -> EvaluationValues:
-    reletive_results = []
+    relative_results = []
 
     # Keep only reletive docs
     for link, score in results:
         if score != 0:
-            reletive_results.append(link)
+            relative_results.append(link)
 
     # Convert to tables for the sklearn lib
-    y_true = [1 if link in ground_truth_set else 0 for link in reletive_results]    
-    y_pred = [1 if link in reletive_results else 0 for link in ground_truth_set]
+    y_true = [1 if link in ground_truth_set else 0 for link in relative_results]    
+    y_pred = [1 if link in relative_results else 0 for link in ground_truth_set]
 
     # Pad with 0 
     while len(y_pred) != len(y_true):

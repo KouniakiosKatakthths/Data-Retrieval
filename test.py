@@ -2,12 +2,14 @@ import search_engine_2
 import json
 import sklearn.metrics as metrics
 
+# Data transfer class for the metrics
 class EvaluationValues:
     _Precision: float
     _Recall: float
     _F1_score: float
     _Map: float
 
+    # Print method
     def print_values(self):
         print(f"Precission: {self._Precision}")
         print(f"Recall: {self._Recall}")
@@ -23,9 +25,11 @@ def evaluate_query(results, ground_truth_set: set) -> EvaluationValues:
         if score != 0:
             reletive_results.append(link)
 
-    y_true = [1 if link in ground_truth_set else 0 for link in reletive_results]
+    # Convert to tables for the sklearn lib
+    y_true = [1 if link in ground_truth_set else 0 for link in reletive_results]    
     y_pred = [1 if link in reletive_results else 0 for link in ground_truth_set]
 
+    # Pad with 0 
     while len(y_pred) != len(y_true):
         y_pred.append(0)
 
@@ -50,6 +54,7 @@ if __name__ == "__main__":
     with open('ground_truths.json', 'r') as file:
         ground_truths = json.load(file)
 
+    # Select the algorithm
     print("Select Evaluation Algorithm")
     print("0. Exit")
     print("1. Boolean Retrieval")
@@ -66,10 +71,12 @@ if __name__ == "__main__":
         query = question['query']
         ground_truths = set(question['links'])
 
+        # Call the data retrival func from the previuse question
         result_set = search_engine_2.dataRetrival(inverted_index, parsed_scrape, option, query)
 
         ev = evaluate_query(result_set, ground_truths)
 
+        # Print the results
         print(f"\nQuery: {query}. Evaluation Values:")
         ev.print_values()
 
